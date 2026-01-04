@@ -1,4 +1,5 @@
 from gettext import install
+
 import pandas as pd
 import pip
 from sklearn.model_selection import train_test_split
@@ -12,6 +13,9 @@ except ModuleNotFoundError:
 import mlflow
 import requests
 import subprocess, sys, importlib
+import os
+import shutil
+import pickle
 
 # Load the data
 data = pd.read_csv(r'C:\Users\dell\Desktop\Demo dvc\skillfy_190725\data\winequality-red.csv')
@@ -57,3 +61,14 @@ with mlflow.start_run():
     mlflow.log_metric("recall_weighted", recall)
     
     mlflow.sklearn.log_model(clf, "random_forest_model")    
+
+    # Save the model as a pickle file
+    model_path = "random_forest_model.pkl"
+    with open(model_path, "wb") as f:
+        pickle.dump(clf, f)
+
+    # Log the pickle file as an artifact in MLflow (and thus Dagshub)
+    mlflow.log_artifact(model_path)
+
+    # Optionally, remove the pickle file after logging
+    os.remove(model_path)
