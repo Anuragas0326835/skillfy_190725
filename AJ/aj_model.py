@@ -1,5 +1,3 @@
-from gettext import install
-
 import pandas as pd
 import pip
 from sklearn.model_selection import train_test_split
@@ -60,7 +58,8 @@ with mlflow.start_run():
     mlflow.log_metric("precision_weighted", precision)
     mlflow.log_metric("recall_weighted", recall)
     
-    mlflow.sklearn.log_model(clf, "random_forest_model")    
+    print("WARNING mlflow.models.model: `artifact_path` is deprecated. Please use `name` instead.")
+    mlflow.sklearn.log_model(clf, name="random_forest_model")    
 
     # Save the model as a pickle file
     model_path = "random_forest_model.pkl"
