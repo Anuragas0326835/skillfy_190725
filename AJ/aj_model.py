@@ -1,8 +1,17 @@
+from gettext import install
 import pandas as pd
+import pip
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+try:
+    import dagshub
+except ModuleNotFoundError:
+    dagshub = None
+import mlflow
+import requests
+import subprocess, sys, importlib
 
 # Load the data
 data = pd.read_csv(r'C:\Users\dell\Desktop\Demo dvc\skillfy_190725\data\winequality-red.csv')
@@ -33,3 +42,18 @@ print(f"Accuracy: {accuracy:.4f}")
 print(f"F1-score: {f1:.4f}")
 print(f"Precision: {precision:.4f}")
 print(f"Recall: {recall:.4f}")
+if dagshub is not None:
+    dagshub.init(repo_owner='Anuragas0326835', repo_name='skillfy_190725', mlflow=True)
+else:
+    print("dagshub not installed; proceeding without Dagshub integration.")
+with mlflow.start_run():
+    mlflow.log_param("model", "RandomForestClassifier")
+    mlflow.log_param("random_state", 42)
+    mlflow.log_param("test_size", 0.2)
+    
+    mlflow.log_metric("accuracy", accuracy)
+    mlflow.log_metric("f1_score_weighted", f1)
+    mlflow.log_metric("precision_weighted", precision)
+    mlflow.log_metric("recall_weighted", recall)
+    
+    mlflow.sklearn.log_model(clf, "random_forest_model")    
